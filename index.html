@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vân Bao Bì — Nhà Phân Phối Bao Bì Phan Rang</title>
+<style>
+  :root{
+    --vang:#FFD100;        /* vàng bảng hiệu */
+    --do:#C8102E;          /* đỏ chữ VÂN */
+    --do-dam:#9B0000;
+    --xanh:#1B5E20;        /* xanh giá sỉ */
+    --nen:#FAF7EF;
+    --the:#FFFFFF;
+    --chu:#241F1C;
+    --chu-mo:#7A736C;
+    --vien:#EBE4D6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--nen);color:var(--chu);padding-bottom:96px}
+
+  /* ── Header kiểu bảng hiệu ── */
+  header{background:var(--vang);border-bottom:4px solid var(--do);padding:14px 16px 12px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+  .brand{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .brand small{display:block;width:100%;font-weight:700;font-size:11px;letter-spacing:.14em;color:var(--do-dam);text-transform:uppercase}
+  .brand h1{font-size:26px;font-weight:900;color:var(--do);letter-spacing:.01em;text-shadow:0 1px 0 #fff}
+  .brand h1 span{color:#1a3ea0}
+  .brand .chinhanh{font-size:12px;font-weight:700;color:#4a3800}
+  .search{margin-top:10px;position:relative}
+  .search input{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--do);border-radius:999px;font-size:15px;background:#fff;outline:none}
+  .search::before{content:"🔍";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px}
+
+  /* ── Chip nhóm hàng ── */
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;padding:7px 14px;border-radius:999px;border:1.5px solid var(--vien);background:var(--the);font-size:13.5px;font-weight:600;color:var(--chu-mo);cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--do);border-color:var(--do);color:#fff}
+
+  /* ── Lưới sản phẩm ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;padding:12px 16px}
+  .card{background:var(--the);border:1px solid var(--vien);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .card .anh{aspect-ratio:4/3;background:linear-gradient(135deg,#FFF3C4,#FFE082);display:flex;align-items:center;justify-content:center;font-size:40px}
+  .card .anh img{width:100%;height:100%;object-fit:cover}
+  .card .tt{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .card .ten{font-size:14.5px;font-weight:700;line-height:1.3}
+  .card .qc{font-size:12px;color:var(--chu-mo)}
+  .card .gia{font-size:15px;font-weight:800;color:var(--do);margin-top:2px}
+  .card .gia small{font-weight:600;color:var(--chu-mo);font-size:11.5px}
+  .card .si{font-size:11.5px;font-weight:700;color:var(--xanh);background:#E8F5E9;border-radius:6px;padding:2px 6px;align-self:flex-start}
+  .card .hethang{font-size:12px;font-weight:700;color:#fff;background:#9e9e9e;border-radius:6px;padding:2px 8px;align-self:flex-start}
+  .card .act{margin-top:auto;padding-top:8px}
+  .btn-them{width:100%;padding:8px 0;border:none;border-radius:9px;background:var(--vang);color:#5c4300;font-weight:800;font-size:14px;cursor:pointer;border:1.5px solid #E6BC00}
+  .qty{display:flex;align-items:center;justify-content:space-between;background:#FFF8DC;border:1.5px solid #E6BC00;border-radius:9px;overflow:hidden}
+  .qty button{width:38px;height:34px;border:none;background:transparent;font-size:19px;font-weight:800;color:var(--do);cursor:pointer}
+  .qty b{font-size:15px}
+
+  /* Ghi chú in ấn */
+  .banner-in{margin:4px 16px 8px;background:#fff;border:1.5px dashed var(--do);border-radius:12px;padding:10px 14px;font-size:13.5px;color:var(--chu)}
+  .banner-in b{color:var(--do)}
+
+  /* ── Thanh giỏ hàng ── */
+  .cartbar{position:fixed;left:12px;right:12px;bottom:12px;background:var(--do);color:#fff;border-radius:14px;padding:12px 16px;display:none;align-items:center;justify-content:space-between;box-shadow:0 6px 18px rgba(200,16,46,.4);cursor:pointer;z-index:60}
+  .cartbar.show{display:flex}
+  .cartbar .sl{font-weight:700;font-size:14px}
+  .cartbar .tong{font-weight:900;font-size:17px}
+
+  /* ── Modal ── */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:100}
+  .overlay.show{display:flex}
+  .sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;max-height:88vh;overflow-y:auto;padding:18px 16px 22px}
+  .sheet h2{font-size:17px;font-weight:800;margin-bottom:12px;color:var(--do)}
+  .dong{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--vien);font-size:14px}
+  .dong .t{font-weight:600}
+  .dong .p{font-weight:700;white-space:nowrap}
+  .dong small{display:block;color:var(--chu-mo);font-size:12px}
+  .dong .note-si{color:var(--xanh);font-weight:700;font-size:11.5px}
+  .tongket{display:flex;justify-content:space-between;padding:12px 0 4px;font-size:16px;font-weight:900}
+  .tongket .p{color:var(--do)}
+  .chon-loai{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 4px}
+  .loai{border:2px solid var(--vien);border-radius:12px;padding:14px 10px;text-align:center;font-weight:700;font-size:14px;cursor:pointer;background:#fff}
+  .loai .ic{font-size:24px;display:block;margin-bottom:4px}
+  .loai.on{border-color:var(--do);background:#FFF5F6;color:var(--do)}
+  .fld{margin:8px 0}
+  .fld label{font-size:12.5px;font-weight:700;color:var(--chu-mo);display:block;margin-bottom:4px}
+  .fld input,.fld textarea{width:100%;padding:10px 12px;border:1.5px solid var(--vien);border-radius:10px;font-size:15px;outline:none;font-family:inherit}
+  .fld input:focus,.fld textarea:focus{border-color:var(--do)}
+  .btn-chinh{width:100%;padding:13px 0;border:none;border-radius:12px;background:var(--do);color:#fff;font-weight:800;font-size:15.5px;cursor:pointer;margin-top:10px}
+  .btn-phu{width:100%;padding:11px 0;border:1.5px solid var(--vien);border-radius:12px;background:#fff;color:var(--chu-mo);font-weight:700;font-size:14px;cursor:pointer;margin-top:8px}
+  .qr-box{text-align:center;margin-top:12px;display:none}
+  .qr-box img{width:200px;border-radius:12px;border:1px solid var(--vien)}
+  .qr-box p{font-size:12.5px;color:var(--chu-mo);margin-top:6px}
+
+  /* ── Footer pills ── */
+  footer{padding:18px 16px 8px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .pill{display:none;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid var(--vien);font-size:13px;font-weight:700;color:var(--chu);text-decoration:none;cursor:pointer}
+  .pill.show{display:inline-flex}
+  .diachi{text-align:center;font-size:12.5px;color:var(--chu-mo);margin-top:12px;line-height:1.5}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:#241F1C;color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:200}
+  .toast.show{opacity:1}
+  .trong{text-align:center;color:var(--chu-mo);padding:40px 16px;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <small>Nhà phân phối</small>
+    <h1>VÂN <span>BAO BÌ</span></h1>
+    <div class="chinhanh">Phan Rang – Ninh Thuận</div>
+  </div>
+  <div class="search"><input id="oTim" type="search" placeholder="Tìm ly, túi xốp, hộp, khay…"></div>
+</header>
+
+<div class="chips" id="oChips"></div>
+
+<div class="banner-in">🖨️ <b>Nhận in bao bì – in ly</b> theo yêu cầu (logo quán, số điện thoại…). Bấm <b>“Báo giá in”</b> ở cuối trang để gửi yêu cầu.</div>
+
+<div class="grid" id="oGrid"></div>
+<div class="trong" id="oTrong" style="display:none">Không tìm thấy sản phẩm nào.</div>
+
+<div class="cartbar" id="oCartbar">
+  <div class="sl" id="oCartSl">0 món</div>
+  <div>Xem giỏ hàng ›</div>
+  <div class="tong" id="oCartTong">0đ</div>
+</div>
+
+<!-- Modal: chọn hình thức nhận hàng -->
+<div class="overlay" id="ovLoai">
+  <div class="sheet">
+    <h2>Nhận hàng bằng cách nào?</h2>
+    <div class="chon-loai">
+      <div class="loai" data-loai="quan"><span class="ic">🏪</span>Lấy tại kho</div>
+      <div class="loai" data-loai="ship"><span class="ic">🚚</span>Giao tận nơi</div>
+    </div>
+    <div id="oFormQuan" style="display:none">
+      <div class="fld"><label>Tên khách / tên quán</label><input id="iTenQuan" placeholder="VD: Cô Hoa – quán bún"></div>
+    </div>
+    <div id="oFormShip" style="display:none">
+      <div class="fld"><label>Tên khách / tên quán</label><input id="iTenShip" placeholder="VD: Cô Hoa – quán bún"></div>
+      <div class="fld"><label>Số điện thoại</label><input id="iSdt" inputmode="tel" placeholder="VD: 09xx xxx xxx"></div>
+      <div class="fld"><label>Địa chỉ giao</label><textarea id="iDiaChi" rows="2" placeholder="Số nhà, đường, phường…"></textarea></div>
+    </div>
+    <button class="btn-chinh" id="btnXemBill" style="display:none">Xem đơn hàng</button>
+    <button class="btn-phu" data-dong>Đóng</button>
+  </div>
+</div>
+
+<!-- Modal: bill -->
+<div class="overlay" id="ovBill">
+  <div class="sheet">
+    <h2>Đơn hàng của bạn</h2>
+    <div id="oBillDong"></div>
+    <div class="tongket"><div>Tổng cộng</div><div class="p" id="oBillTong">0đ</div></div>
+    <button class="btn-chinh" id="btnZalo">📩 Gửi đơn qua Zalo</button>
+    <div class="qr-box" id="oQr"><img id="oQrImg" alt="VietQR"><p>Quét mã VietQR để chuyển khoản</p></div>
+    <button class="btn-phu" data-dong>Quay lại</button>
+  </div>
+</div>
+
+<footer>
+  <div class="pills">
+    <a class="pill" id="pMaps" target="_blank">📍 Chỉ đường</a>
+    <a class="pill" id="pFanpage" target="_blank">👍 Fanpage</a>
+    <a class="pill" id="pTiktok" target="_blank">🎵 TikTok</a>
+    <a class="pill" id="pDanhGia" target="_blank">⭐ <span id="pDanhGiaText">Đánh giá</span></a>
+    <a class="pill" id="pInAn">🖨️ Báo giá in</a>
+    <a class="pill" id="pVcf">💾 Lưu liên hệ</a>
+  </div>
+  <div class="diachi" id="oDiaChi"></div>
+</footer>
+
+<div class="toast" id="oToast"></div>
+
+<script>
+/* ═══════════════ CẤU HÌNH ═══════════════
+   Khi có Google Sheet thật:
+   1. Tạo Sheet 2 tab:
+      - SanPham: Nhóm | Tên | Quy Cách | Đơn Vị | Giá Lẻ | Giá Sỉ | Sỉ Từ | Hình Ảnh | Còn Hàng
+      - Info   : Trường | Giá Trị  (Địa Chỉ, Số điện thoại, Link Maps, Fanpage,
+                 TikTok, Quick Link VietQR, Đánh Giá, Link Đánh Giá Google)
+   2. File > Chia sẻ > Xuất bản lên web > từng tab dạng CSV
+   3. Dán 2 link CSV vào dưới đây. Để trống = chạy dữ liệu mẫu.
+*/
+const SHOP_NAME = "Vân Bao Bì";
+const CSV_SANPHAM = "";   // ← dán link CSV tab SanPham
+const CSV_FOOTER  = "";   // ← dán link CSV tab Info
+
+/* ─────────── DỮ LIỆU MẪU (demo) ─────────── */
+const MAU_SANPHAM = [
+ ["Ly nhựa","Ly nhựa PP 500ml","Cây 50 cái","cây","25000","22000","10","","x"],
+ ["Ly nhựa","Ly nhựa PET 700ml + nắp cầu","Cây 50 bộ","cây","48000","44000","10","","x"],
+ ["Ly nhựa","Ly giấy 240ml","Cây 50 cái","cây","30000","27000","10","","x"],
+ ["Ly nhựa","Ống hút bọc giấy","Bịch 100 ống","bịch","12000","10000","20","","x"],
+ ["Túi xốp","Túi xốp 1kg","Bán theo kg","kg","38000","35000","5","","x"],
+ ["Túi xốp","Túi xốp 3kg","Bán theo kg","kg","38000","35000","5","","x"],
+ ["Túi xốp","Túi hột xoài 25x35","Bán theo kg","kg","42000","39000","5","","x"],
+ ["Hộp","Hộp nhựa chữ nhật 750ml + nắp","Cây 50 bộ","cây","65000","60000","5","","x"],
+ ["Hộp","Hộp tròn 500ml + nắp","Cây 50 bộ","cây","55000","50000","5","","x"],
+ ["Hộp","Hộp xốp cơm trắng","Cây 100 cái","cây","70000","64000","5","","x"],
+ ["Khay hải sản","Khay xốp đen size 2","Cây 100 cái","cây","45000","41000","5","","x"],
+ ["Khay hải sản","Túi PA hút chân không 20x30","Bịch 100 túi","bịch","85000","78000","5","","x"],
+ ["Khay hải sản","Thùng xốp đá lớn","Cái","cái","35000","32000","10","","x"],
+ ["Khay hải sản","Màng PE quấn hàng","Cuộn 2.2kg","cuộn","95000","88000","5","",""]
+];
+const MAU_FOOTER = {
+  "Địa Chỉ":"Chợ Đông, 44P Trần Nhân Tông – Phan Rang, Ninh Thuận",
+  "Số điện thoại":"0909077661",
+  "Link Maps":"https://maps.google.com/?q=44+Tr%E1%BA%A7n+Nh%C3%A2n+T%C3%B4ng+Phan+Rang",
+  "Fanpage":"",
+  "TikTok":"",
+  "Quick Link VietQR":"",
+  "Đánh Giá":"",
+  "Link Đánh Giá Google":""
+};
+
+/* ─────────── TIỆN ÍCH ─────────── */
+function parseCSV(text){
+  const rows=[];let row=[],cell="",inQ=false;
+  text=text.replace(/\r\n/g,"\n");
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else inQ=false; } else cell+=c; }
+    else{ if(c==='"')inQ=true;
+      else if(c===','){row.push(cell);cell="";}
+      else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell="";}
+      else cell+=c; }
+  }
+  if(cell!==""||row.length){row.push(cell);rows.push(row);}
+  return rows;
+}
+function soTien(s){ // "25k" | "25.000" | "25000" → 25000
+  if(typeof s==="number")return s;
+  s=(s||"").toString().trim().toLowerCase();
+  if(!s)return 0;
+  if(s.endsWith("k"))return Math.round(parseFloat(s.replace(",","."))*1000)||0;
+  return parseInt(s.replace(/[.,\s]/g,""),10)||0;
+}
+function vnd(n){return n.toLocaleString("vi-VN")+"đ";}
+function toast(msg){
+  const t=document.getElementById("oToast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2200);
+}
+const ICON_NHOM={"Ly nhựa":"🥤","Túi xốp":"🛍️","Hộp":"🍱","Khay hải sản":"🦐"};
+
+/* ─────────── TRẠNG THÁI ─────────── */
+let SANPHAM=[];          // {id,nhom,ten,quyCach,donVi,giaLe,giaSi,siTu,anh,conHang}
+let FOOTER={};
+let gio={};              // id → qty
+let nhomChon="Tất cả";
+let loaiDon=null;        // "quan" | "ship"
+
+/* ─────────── NẠP DỮ LIỆU ─────────── */
+function napSanPham(rows){
+  SANPHAM=rows.filter(r=>r[1]&&r[1].trim()).map((r,i)=>({
+    id:"sp"+i, nhom:(r[0]||"Khác").trim(), ten:r[1].trim(),
+    quyCach:(r[2]||"").trim(), donVi:(r[3]||"đv").trim(),
+    giaLe:soTien(r[4]), giaSi:soTien(r[5]), siTu:parseInt(r[6],10)||0,
+    anh:(r[7]||"").trim(), conHang:(r[8]||"").trim()!==""
+  })).filter(p=>p.giaLe>0);
+}
+async function napCSV(url){
+  const res=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now());
+  return parseCSV(await res.text());
+}
+async function khoiTao(){
+  try{
+    if(CSV_SANPHAM){ const rows=await napCSV(CSV_SANPHAM); napSanPham(rows.slice(1)); }
+    else napSanPham(MAU_SANPHAM);
+  }catch(e){ napSanPham(MAU_SANPHAM); }
+  try{
+    if(CSV_FOOTER){ const rows=await napCSV(CSV_FOOTER);
+      rows.slice(1).forEach(r=>{ if(r[0])FOOTER[r[0].trim()]=(r[1]||"").trim(); }); }
+    else FOOTER={...MAU_FOOTER};
+  }catch(e){ FOOTER={...MAU_FOOTER}; }
+  veChips(); veGrid(); veFooter();
+}
+
+/* ─────────── GIAO DIỆN ─────────── */
+function veChips(){
+  const nhoms=["Tất cả",...new Set(SANPHAM.map(p=>p.nhom))];
+  document.getElementById("oChips").innerHTML=nhoms.map(n=>
+    `<div class="chip${n===nhomChon?" on":""}" data-n="${n}">${n}</div>`).join("");
+}
+function veGrid(){
+  const tim=document.getElementById("oTim").value.trim().toLowerCase();
+  const ds=SANPHAM.filter(p=>
+    (nhomChon==="Tất cả"||p.nhom===nhomChon)&&
+    (!tim||p.ten.toLowerCase().includes(tim)||p.nhom.toLowerCase().includes(tim)));
+  document.getElementById("oTrong").style.display=ds.length?"none":"block";
+  document.getElementById("oGrid").innerHTML=ds.map(p=>{
+    const q=gio[p.id]||0;
+    const act=!p.conHang?`<div class="hethang">Tạm hết hàng</div>`
+      :q===0?`<button class="btn-them" data-them="${p.id}">+ Thêm</button>`
+      :`<div class="qty"><button data-giam="${p.id}">−</button><b>${q}</b><button data-tang="${p.id}">＋</button></div>`;
+    return `<div class="card">
+      <div class="anh">${p.anh?`<img src="${p.anh}" alt="">`:(ICON_NHOM[p.nhom]||"📦")}</div>
+      <div class="tt">
+        <div class="ten">${p.ten}</div>
+        <div class="qc">${p.quyCach}</div>
+        <div class="gia">${vnd(p.giaLe)} <small>/ ${p.donVi}</small></div>
+        ${p.giaSi&&p.siTu?`<div class="si">Sỉ ${vnd(p.giaSi)} từ ${p.siTu} ${p.donVi}</div>`:""}
+        <div class="act">${act}</div>
+      </div></div>`;
+  }).join("");
+  veCartbar();
+}
+function donGia(p,q){ return (p.giaSi&&p.siTu&&q>=p.siTu)?p.giaSi:p.giaLe; }
+function tinhTong(){
+  let tong=0,sl=0;
+  for(const id in gio){ const p=SANPHAM.find(x=>x.id===id); if(!p)continue;
+    tong+=donGia(p,gio[id])*gio[id]; sl+=gio[id]; }
+  return {tong,sl};
+}
+function veCartbar(){
+  const {tong,sl}=tinhTong();
+  const bar=document.getElementById("oCartbar");
+  bar.classList.toggle("show",sl>0);
+  document.getElementById("oCartSl").textContent=sl+" món";
+  document.getElementById("oCartTong").textContent=vnd(tong);
+}
+function veBill(){
+  let html="";
+  for(const id in gio){ const p=SANPHAM.find(x=>x.id===id); if(!p)continue;
+    const q=gio[id],dg=donGia(p,q),si=dg===p.giaSi&&p.giaSi<p.giaLe;
+    html+=`<div class="dong"><div class="t">${p.ten}
+      <small>${q} ${p.donVi} × ${vnd(dg)}${si?` <span class="note-si">(giá sỉ)</span>`:""}</small></div>
+      <div class="p">${vnd(dg*q)}</div></div>`; }
+  document.getElementById("oBillDong").innerHTML=html;
+  document.getElementById("oBillTong").textContent=vnd(tinhTong().tong);
+}
+function veFooter(){
+  const f=FOOTER;
+  const set=(id,link,dk)=>{ const el=document.getElementById(id);
+    if(dk){ el.classList.add("show"); if(link)el.href=link; } };
+  set("pMaps",f["Link Maps"],!!f["Link Maps"]);
+  set("pFanpage",f["Fanpage"],!!f["Fanpage"]);
+  set("pTiktok",f["TikTok"],!!f["TikTok"]);
+  if(f["Đánh Giá"]&&f["Link Đánh Giá Google"]){
+    document.getElementById("pDanhGiaText").textContent=f["Đánh Giá"];
+    set("pDanhGia",f["Link Đánh Giá Google"],true); }
+  set("pInAn",null,!!f["Số điện thoại"]);
+  set("pVcf",null,!!f["Số điện thoại"]);
+  document.getElementById("oDiaChi").textContent=f["Địa Chỉ"]||"";
+  // VietQR: chỉ hiện khi link hợp lệ
+  const qr=(f["Quick Link VietQR"]||"").trim();
+  if(qr.startsWith("http")){ document.getElementById("oQrImg").src=qr;
+    document.getElementById("oQr").style.display="block"; }
+}
+
+/* ─────────── ĐƠN HÀNG / ZALO ─────────── */
+function soanTinNhan(){
+  let msg=`ĐƠN HÀNG – ${SHOP_NAME}\n`;
+  msg+=loaiDon==="ship"?"🚚 Giao tận nơi\n":"🏪 Lấy tại kho\n";
+  if(loaiDon==="ship"){
+    msg+=`Khách: ${document.getElementById("iTenShip").value.trim()}\n`;
+    msg+=`SĐT: ${document.getElementById("iSdt").value.trim()}\n`;
+    msg+=`Địa chỉ: ${document.getElementById("iDiaChi").value.trim()}\n`;
+  }else{
+    msg+=`Khách: ${document.getElementById("iTenQuan").value.trim()}\n`;
+  }
+  msg+="――――――――――\n";
+  for(const id in gio){ const p=SANPHAM.find(x=>x.id===id); if(!p)continue;
+    const q=gio[id],dg=donGia(p,q);
+    msg+=`• ${p.ten} — ${q} ${p.donVi} × ${vnd(dg)} = ${vnd(dg*q)}\n`; }
+  msg+=`――――――――――\nTỔNG: ${vnd(tinhTong().tong)}`;
+  return msg;
+}
+async function guiZalo(){
+  const msg=soanTinNhan();
+  try{ await navigator.clipboard.writeText(msg); toast("Đã copy đơn hàng — dán vào Zalo nhé!"); }
+  catch(e){ toast("Hãy dán đơn hàng vào Zalo"); }
+  const sdt=(FOOTER["Số điện thoại"]||"").replace(/\D/g,"");
+  if(sdt) setTimeout(()=>window.open("https://zalo.me/"+sdt,"_blank"),600);
+}
+
+/* ─────────── SỰ KIỆN ─────────── */
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.n){ nhomChon=t.dataset.n; veChips(); veGrid(); }
+  if(t.dataset.them){ gio[t.dataset.them]=1; veGrid(); }
+  if(t.dataset.tang){ gio[t.dataset.tang]++; veGrid(); }
+  if(t.dataset.giam){ gio[t.dataset.giam]--; if(gio[t.dataset.giam]<=0)delete gio[t.dataset.giam]; veGrid(); }
+  if(t.closest("[data-dong]")) t.closest(".overlay").classList.remove("show");
+  const lo=t.closest(".loai");
+  if(lo){ loaiDon=lo.dataset.loai;
+    document.querySelectorAll(".loai").forEach(x=>x.classList.toggle("on",x===lo));
+    document.getElementById("oFormQuan").style.display=loaiDon==="quan"?"block":"none";
+    document.getElementById("oFormShip").style.display=loaiDon==="ship"?"block":"none";
+    document.getElementById("btnXemBill").style.display="block"; }
+});
+document.getElementById("oCartbar").addEventListener("click",()=>document.getElementById("ovLoai").classList.add("show"));
+document.getElementById("btnXemBill").addEventListener("click",()=>{
+  document.getElementById("ovLoai").classList.remove("show");
+  veBill(); document.getElementById("ovBill").classList.add("show"); });
+document.getElementById("btnZalo").addEventListener("click",guiZalo);
+document.getElementById("oTim").addEventListener("input",veGrid);
+document.getElementById("pInAn").addEventListener("click",async()=>{
+  const msg=`BÁO GIÁ IN – ${SHOP_NAME}\nLoại (ly/túi/hộp): \nSố lượng: \nSố màu in: \nGhi chú: `;
+  try{ await navigator.clipboard.writeText(msg); toast("Đã copy mẫu yêu cầu in — dán vào Zalo!"); }catch(e){}
+  const sdt=(FOOTER["Số điện thoại"]||"").replace(/\D/g,"");
+  if(sdt) setTimeout(()=>window.open("https://zalo.me/"+sdt,"_blank"),600);
+});
+document.getElementById("pVcf").addEventListener("click",()=>{
+  const sdt=FOOTER["Số điện thoại"]||"";
+  const vcf=`BEGIN:VCARD\nVERSION:3.0\nFN:${SHOP_NAME}\nTEL;TYPE=CELL:${sdt}\nADR:;;${(FOOTER["Địa Chỉ"]||"").replace(/,/g,"\\,")}\nEND:VCARD`;
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([vcf],{type:"text/vcard"}));
+  a.download="van-bao-bi.vcf"; a.click();
+});
+
+khoiTao();
+</script>
+</body>
+</html>
